@@ -31,27 +31,35 @@ if st.button("Send"):
     xq = res['data'][0]['embedding']
 
     # get relevant contexts (including the questions)
-    res = index.query(xq, top_k=3, include_metadata=True, namespace='langchain-chunking')
+    res = index.query(xq, top_k=5, include_metadata=True, namespace='langchain-chunking')
 
 
     contexts = [item['metadata']['text'] for item in res['matches']]
     augmented_query = "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+query
 
 
-    primer = f"""You are Q&A bot. A highly intelligent system that answers
+    primer = f"""You are a customer support agent. A highly intelligent agent that answers
     user questions based on the information provided by the user above
     each question. If the information can not be found in the information
-    provided by the user you truthfully say "I don't know".
+    provided by the user you truthfully say "I don't know". Respond using markdown.
     """
 
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        max_tokens=1024,
-        temperature=0.1,
+        max_tokens=2000,
+        temperature=0.3,
         messages=[
             {"role": "system", "content": primer},
             {"role": "user", "content": augmented_query}
-        ]
+        ],
+        stream = True
     )
 
-    st.markdown(res['choices'][0]['message']['content'])
+    container = st.empty()
+    messages: list[str] = []
+    for chunk in res:
+        chunk_message = chunk['choices'][0]['delta'].get('content', '')
+        messages.append(chunk_message)
+        container.markdown("".join(messages))
+
+    # st.markdown(res['choices'][0]['message']['content'])

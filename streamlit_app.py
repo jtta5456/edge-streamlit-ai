@@ -8,7 +8,7 @@ input_txt = st.text_input("Ask a question")
 if st.button("Send"):
     query = input_txt
 
-    openai.api_key = st.secrets["OPENAI_API_KEY"]  #platform.openai.com
+    openai.api_key = st.secrets.OPENAI_API_KEY  #platform.openai.com
 
     embed_model = "text-embedding-ada-002"
 

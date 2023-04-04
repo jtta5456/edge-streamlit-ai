@@ -1,0 +1,57 @@
+import streamlit as st
+import openai
+import pinecone
+
+input_txt = st.text_input("Ask a question")
+
+if st.button("Send"):
+    query = input_txt
+
+    openai.api_key = "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"  #platform.openai.com
+
+    embed_model = "text-embedding-ada-002"
+
+    index_name = 'edge-user'
+
+    # initialize connection to pinecone
+    pinecone.init(
+        api_key="c51ef500-dbf9-4bc1-a0e6-0024f2125eb1",  # app.pinecone.io (console)
+        environment="eu-west1-gcp"  # next to API key in console
+    )
+    # connect to index
+    index = pinecone.GRPCIndex(index_name)
+
+
+    res = openai.Embedding.create(
+        input=[query],
+        engine=embed_model
+    )
+
+    # retrieve from Pinecone
+    xq = res['data'][0]['embedding']
+
+    # get relevant contexts (including the questions)
+    res = index.query(xq, top_k=3, include_metadata=True, namespace='langchain-chunking')
+
+
+    contexts = [item['metadata']['text'] for item in res['matches']]
+    augmented_query = "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+query
+
+
+    primer = f"""You are Q&A bot. A highly intelligent system that answers
+    user questions based on the information provided by the user above
+    each question. If the information can not be found in the information
+    provided by the user you truthfully say "I don't know".
+    """
+
+    res = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        max_tokens=1024,
+        temperature=0.1,
+        messages=[
+            {"role": "system", "content": primer},
+            {"role": "user", "content": augmented_query}
+        ]
+    )
+
+    st.markdown(res['choices'][0]['message']['content'])

@@ -16,7 +16,7 @@ if st.button("Send"):
 
     # initialize connection to pinecone
     pinecone.init(
-        api_key="c51ef500-dbf9-4bc1-a0e6-0024f2125eb1",  # app.pinecone.io (console)
+        api_key = st.secrets['pinecone_api_key'],  # app.pinecone.io (console)
         environment="eu-west1-gcp"  # next to API key in console
     )
     # connect to index

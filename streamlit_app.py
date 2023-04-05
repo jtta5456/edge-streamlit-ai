@@ -48,7 +48,7 @@ if st.button("Send"):
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         max_tokens=2000,
-        temperature=0.3,
+        temperature=0.2,
         messages=[
             {"role": "system", "content": primer},
             {"role": "user", "content": augmented_query}

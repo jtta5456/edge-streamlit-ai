@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 import pinecone
 
-st.header("Mr. Edge")
+st.header("Mr. Edge V2")
 input_txt = st.text_input("Ask a question")
 
 if st.button("Send"):
@@ -36,21 +36,17 @@ if st.button("Send"):
 
 
     contexts = [item['metadata']['text'] for item in res['matches']]
-    augmented_query = "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+query
+    augmented_query = 'Context:\n'+"\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
 
-    primer = f"""You are a customer support agent. A highly intelligent agent that answers
-    user questions based on the information provided by the user above
-    each question. If the information can not be found in the information
-    provided by the user you truthfully say "I don't know". Respond using markdown.
-    """
+    primer = f"""You are a customer support agent working for The Edge. Answer the following question using the context provided. The context may have formatting errors. Respond using markdown."""
 
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         max_tokens=2000,
         temperature=0.2,
         messages=[
-            {"role": "system", "content": primer},
+            {"role": "user", "content": primer},
             {"role": "user", "content": augmented_query}
         ],
         stream = True

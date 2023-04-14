@@ -39,7 +39,7 @@ if st.button("Send"):
     augmented_query = 'Context:\n'+"\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
 
-    primer = f"""You are a customer support agent working for The Edge. You are clear and concise with your answers. Provide links as references. If the question is vague, ask for more information. Answer the following question using the context provided. The context may have formatting errors. Respond using markdown."""
+    primer = f"""You are a customer support agent working for The Edge. You are clear and concise with your answers. If the question is vague, ask for more information. Answer the following question using the context provided. The context may have formatting errors. Respond using markdown."""
 
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

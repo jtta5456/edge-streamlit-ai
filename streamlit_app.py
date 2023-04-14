@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 import pinecone
 
-st.header("Mr. Edge V2.2")
+st.header("Mr. Edge V2.3")
 input_txt = st.text_input("Ask a question")
 
 if st.button("Send"):
@@ -34,54 +34,24 @@ if st.button("Send"):
     res = index.query(xq, top_k=4, include_metadata=True,
                       namespace='with-urls')
 
-    # contexts = [
-    #     f"##Link:\n{item['metadata']['url']}\n##Body:\n{item['metadata']['text']}" for item in res['matches']]
-    # augmented_query = 'Context:\n' + \
-    #     "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
+    contexts = [
+        f"URL:\n{item['metadata']['url']}\nText:\n{item['metadata']['text']}" for item in res['matches']]
+    augmented_query = 'Context:\n' + \
+        "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
-    # primer = f"""You are a customer support agent working for The Edge. You are clear and concise with your answers. If the question is vague, ask for more information. Answer the following question using the context provided. Provite citations to your sources. Respond using markdown."""
+    primer = f"""You are a customer support agent working for The Edge. You are clear and concise with your answers. If the question is vague, ask for more information. Answer the following question using the context provided. Provite citations to your sources. Respond using markdown."""
 
-    files_string = ""
-
-    for i in range(len(res.matches)):
-        result = res.matches[i]
-        file_chunk_id = result.id
-        score = result.score
-        url_link = result.metadata["url"]
-        url_text = result.metadata['text']
-        file_string = f"###\n\"{url_link}\"\n{url_text}\n"
-
-        files_string += file_string
-
-    messagess = [
-        {
-            "role": "system",
-            "content": f"Given a question, try to answer it using the content of the links below, and if you cannot answer, or find "
-            f"a relevant link, just output \"I couldn't find the answer to that question.\".\n\n"
-            f"If the answer is not contained in the links or if there are no links, respond with \"I couldn't find the answer "
-            f".\" If the question is not actually a question, respond with \"That's not a valid question.\"\n\n"
-            f"In the cases where you can find the answer, first give the answer. Then explain how you found the answer from the source or sources, "
-            f"and use the exact links of the source info you mention. Do not make up the names of any other links other than those mentioned "
-            f"in the links context. Give the answer in markdown format."
-            f"Use the following format:\n\nQuestion: <question>\n\nLinks:\n<###\n\"link 1\"\nlink text>\n<###\n\"link 2\"\nlink text>...\n\n"
-            f"Answer: <answer or \"I couldn't find the answer to that question\" or \"That's not a valid question.\">\n\n"
-            f"Question: {query}\n\n"
-            f"Links:\n{files_string}\n"
-            f"Answer:"
-        },
-    ]
+    full_message = primer + '\n\n' + augmented_query
 
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         max_tokens=2000,
         temperature=0.2,
-        messages=messagess,
+        messages=[
+            {"role": "user", "content": full_message}
+        ],
         stream=True
     )
-    # messages=[
-    #     {"role": "user", "content": primer},
-    #     {"role": "user", "content": augmented_query}
-    # ],
 
     container = st.empty()
     messages: list[str] = []

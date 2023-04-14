@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 import pinecone
 
-st.header("Mr. Edge V2")
+st.header("Mr. Edge V2.1")
 input_txt = st.text_input("Ask a question")
 
 if st.button("Send"):

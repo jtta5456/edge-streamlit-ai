@@ -35,7 +35,7 @@ if st.button("Send"):
     res = index.query(xq, top_k=5, include_metadata=True, namespace='with-urls')
 
 
-    contexts = [item['metadata']['text'] for item in res['matches']]
+    contexts = ['Link:\n' + item['metadata']['source'] + '\n' + item['metadata']['text'] for item in res['matches']]
     augmented_query = 'Context:\n'+"\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
 

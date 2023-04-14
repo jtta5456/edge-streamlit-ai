@@ -32,9 +32,9 @@ if st.button("Send"):
     xq = res['data'][0]['embedding']
 
     # get relevant contexts (including the questions)
-    res = index.query(xq, top_k=5, include_metadata=True, namespace='with-urls')
+    res = index.query(xq, top_k=4, include_metadata=True, namespace='with-urls')
 
-    contexts = [f"Link:\n{item['metadata']['url']}\nBody:\n{item['metadata']['text']}" for item in res['matches']]
+    contexts = [f"##Link:\n{item['metadata']['url']}\n##Body:\n{item['metadata']['text']}" for item in res['matches']]
     augmented_query = 'Context:\n'+"\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
 

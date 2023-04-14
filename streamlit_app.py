@@ -32,7 +32,7 @@ if st.button("Send"):
     xq = res['data'][0]['embedding']
 
     # get relevant contexts (including the questions)
-    res = index.query(xq, top_k=5, include_metadata=True, namespace='langchain-chunking')
+    res = index.query(xq, top_k=5, include_metadata=True, namespace='')
 
 
     contexts = [item['metadata']['text'] for item in res['matches']]

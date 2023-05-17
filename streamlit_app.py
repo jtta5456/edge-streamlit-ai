@@ -37,9 +37,9 @@ if st.button("Send"):
     contexts = [
         f"URL:\n{item['metadata']['url']}\nText:\n{item['metadata']['text']}" for item in res['matches']]
     augmented_query = 'Context:\n' + \
-        "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
+        "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query + '\n\nAnswer:'
 
-    primer = f"""You are a customer support agent working for The Edge. If the question is vague, ask for more information. Answer the following question using the context provided. Respond using markdown."""
+    primer = f"""You are a customer support agent working for The Edge. Answer the following question using the context provided. Respond using markdown."""
 
     full_message = primer + '\n\n' + augmented_query
 

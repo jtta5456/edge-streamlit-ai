@@ -31,7 +31,7 @@ if st.button("Send"):
     xq = res['data'][0]['embedding']
 
     # get relevant contexts (including the questions)
-    res = index.query(xq, top_k=4, include_metadata=True,
+    res = index.query(xq, top_k=5, include_metadata=True,
                       namespace='with-urls')
 
     contexts = [
@@ -39,14 +39,14 @@ if st.button("Send"):
     augmented_query = 'Context:\n' + \
         "\n\n---\n\n".join(contexts)+"\n\n-----\n\n"+'Question:\n'+query
 
-    primer = f"""You are a customer support agent working for The Edge. You are clear and concise with your answers. If the question is vague, ask for more information. Answer the following question using the context provided. Provite citations to your sources. Respond using markdown."""
+    primer = f"""You are a customer support agent working for The Edge. If the question is vague, ask for more information. Answer the following question using the context provided. Respond using markdown."""
 
     full_message = primer + '\n\n' + augmented_query
 
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         max_tokens=2000,
-        temperature=0.2,
+        temperature=0.1,
         messages=[
             {"role": "user", "content": full_message}
         ],
